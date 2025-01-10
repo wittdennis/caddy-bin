@@ -20,15 +20,19 @@ xcaddy() {
         EXT=".exe"
     fi
 
-    FILENAME=caddy-${CADDY_VERSION:1}-$GOOS-$GOARCH$EXT
+    FILENAME=caddy_${CADDY_VERSION:1}_${GOOS}_${GOARCH}${EXT}
 
     $PWD/tools/xcaddy build $CADDY_VERSION \
         --with github.com/caddy-dns/cloudflare \
-        --with github.com/caddy-dns/route53 \
         --output dist/$FILENAME
 
     if [ -f "dist/$FILENAME" ]; then
-        tar czf dist/caddy-${CADDY_VERSION:1}-$GOOS-$GOARCH.tar.gz dist/$FILENAME
+        pushd dist
+        tar czf caddy_${CADDY_VERSION:1}_${GOOS}_${GOARCH}.tar.gz $FILENAME
+        sha512sum caddy_${CADDY_VERSION:1}_${GOOS}_${GOARCH}.tar.gz >>caddy_${CADDY_VERSION:1}_checksums.txt
+        popd
+    else
+        exit 1
     fi
 }
 

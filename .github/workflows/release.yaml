@@ -19,26 +19,23 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.RELEASE_TOKEN }}
 
-      - name: setup git config
+      - name: install dependencies
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-
-      - name: install cocogitto
-        uses: oknozor/cocogitto-action@v3.9
-        with:
-          check: false
+          sudo apt-get update
+          sudo apt-get install tar gzip
 
       - name: build caddy
+        id: release
         run: |
           #!/bin/bash
           set -eu
 
           ./build.sh "${{ inputs.caddy_version }}" "${{ inputs.xcaddy_version }}"
+          ls -la dist
+          CADDY_VERSION=${{ inputs.caddy_version }}
+          TRIMMED_VERSION=${CADDY_VERSION:1}
+          echo "version=$TRIMMED_VERSION" >> $GITHUB_OUTPUT
 
       - uses: softprops/action-gh-release@v2.2.1
         name: create release
@@ -47,12 +44,14 @@ jobs:
             For caddy changelogs look here: https://github.com/caddyserver/caddy/releases/tag/${{ inputs.caddy_version }}
           tag_name: ${{ inputs.caddy_version }}
           token: ${{ secrets.RELEASE_TOKEN }}
+          fail_on_unmatched_files: true
           files: |
-            dist/caddy_${{ inputs.caddy_version }}_darwin_amd64.tar.gz
-            dist/caddy_${{ inputs.caddy_version }}_darwin_arm64.tar.gz
-            dist/caddy_${{ inputs.caddy_version }}_linux_386.tar.gz
-            dist/caddy_${{ inputs.caddy_version }}_linux_amd64.tar.gz
-            dist/caddy_${{ inputs.caddy_version }}_linux_arm64.tar.gz
-            dist/caddy_${{ inputs.caddy_version }}_windows_386.tar.gz
-            dist/caddy_${{ inputs.caddy_version }}_windows_amd64.tar.gz
-            dist/caddy_${{ inputs.caddy_version }}_windows_arm64.tar.gz
+            dist/caddy-${{ steps.release.outputs.version }}-checksums.txt
+            dist/caddy-${{ steps.release.outputs.version }}-darwin-amd64.tar.gz
+            dist/caddy-${{ steps.release.outputs.version }}-darwin-arm64.tar.gz
+            dist/caddy-${{ steps.release.outputs.version }}-linux-386.tar.gz
+            dist/caddy-${{ steps.release.outputs.version }}-linux-amd64.tar.gz
+            dist/caddy-${{ steps.release.outputs.version }}-linux-arm64.tar.gz
+            dist/caddy-${{ steps.release.outputs.version }}-windows-386.tar.gz
+            dist/caddy-${{ steps.release.outputs.version }}-windows-amd64.tar.gz
+            dist/caddy-${{ steps.release.outputs.version }}-windows-arm64.tar.gz

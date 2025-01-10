@@ -5,6 +5,7 @@ from_latest_tag = false
 generate_mono_repository_global_tag = true
 ignore_merge_commits = false
 post_bump_hooks = [
+  "./build.sh {{version}}",
   "git push",
   "git push origin {{version}}",
 ]
@@ -19,12 +20,12 @@ skip_untracked = false
 [commit_types]
 
 [changelog]
-authors = [] 
-path = "CHANGELOG.md" 
-template = "default" # to change to remote uncomment repository and owner owner and set remote to repository name
-# repository = "repo-template-ansible-role"
-# remote = "github.com"
-# owner = "wittdennis"
+authors = []
+path = "CHANGELOG.md"
+template = "remote" # to change to remote uncomment repository and owner owner and set remote to repository name
+repository = "caddy-bin"
+remote = "github.com"
+owner = "wittdennis"
 
 [bump_profiles]
 

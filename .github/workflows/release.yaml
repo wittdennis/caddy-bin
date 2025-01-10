@@ -1,7 +1,18 @@
-name: gihub-release
+name: github-release
 
 on:
   workflow_dispatch:
+    inputs:
+      xcaddy_version:
+        description: Version of xcaddy to use.
+        default: v0.4.4 # renovate: datasource=github-releases depName=caddyserver/xcaddy versioning=semver
+        required: true
+        type: string
+      caddy_version:
+        description: Version of caddy to compile.
+        default: v2.9.1 # renovate: datasource=github-releases depName=caddyserver/caddy versioning=semver
+        required: true
+        type: string
 
 jobs:
   release:
@@ -17,21 +28,31 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
 
-      - name: bump version
-        id: release
+      - name: install cocogitto
         uses: oknozor/cocogitto-action@v3.9
         with:
-          release: true
-          check-latest-tag-only: true
-          git-user: github-actions
-          git-user-email: github-actions@github.com
+          check: false
 
-      - name: generate changelog
-        run: cog changelog --at ${{ steps.release.outputs.version }} > GITHUB_CHANGELOG.md
+      - name: build caddy
+        run: |
+          #!/bin/bash
+          set -eu
+
+          ./build.sh "${{ inputs.caddy_version }}" "${{ inputs.xcaddy_version }}"
 
       - uses: softprops/action-gh-release@v2.2.1
         name: create release
         with:
-          body_path: GITHUB_CHANGELOG.md
-          tag_name: ${{ steps.release.outputs.version }}
+          body: |
+            For caddy changelogs look here: https://github.com/caddyserver/caddy/releases/tag/${{ inputs.caddy_version }}
+          tag_name: ${{ inputs.caddy_version }}
           token: ${{ secrets.RELEASE_TOKEN }}
+          files: |
+            dist/caddy_${{ inputs.caddy_version }}_darwin_amd64.tar.gz
+            dist/caddy_${{ inputs.caddy_version }}_darwin_arm64.tar.gz
+            dist/caddy_${{ inputs.caddy_version }}_linux_386.tar.gz
+            dist/caddy_${{ inputs.caddy_version }}_linux_amd64.tar.gz
+            dist/caddy_${{ inputs.caddy_version }}_linux_arm64.tar.gz
+            dist/caddy_${{ inputs.caddy_version }}_windows_386.tar.gz
+            dist/caddy_${{ inputs.caddy_version }}_windows_amd64.tar.gz
+            dist/caddy_${{ inputs.caddy_version }}_windows_arm64.tar.gz

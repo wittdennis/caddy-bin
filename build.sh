@@ -48,4 +48,4 @@ xcaddy linux amd64
 xcaddy linux arm64
 xcaddy windows 386
 xcaddy windows amd64
-xcaddy linux arm64
+xcaddy windows arm64

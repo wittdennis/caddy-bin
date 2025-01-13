@@ -22,15 +22,18 @@ xcaddy() {
 
     DIRNAME=caddy_${CADDY_VERSION:1}_${GOOS}_${GOARCH}
     FILENAME=caddy${EXT}
+    ARCHIVENAME=caddy_${CADDY_VERSION:1}_${GOOS}_${GOARCH}.tar.gz
 
     $PWD/tools/xcaddy build $CADDY_VERSION \
         --with github.com/caddy-dns/cloudflare \
         --output dist/$DIRNAME/$FILENAME
 
     if [ -f "dist/$DIRNAME/$FILENAME" ]; then
+        pushd dist/$DIRNAME
+        tar czf ../$ARCHIVENAME $FILENAME
+        popd
         pushd dist
-        tar czf caddy_${CADDY_VERSION:1}_${GOOS}_${GOARCH}.tar.gz $DIRNAME
-        sha512sum caddy_${CADDY_VERSION:1}_${GOOS}_${GOARCH}.tar.gz >>caddy_${CADDY_VERSION:1}_checksums.txt
+        sha512sum $ARCHIVENAME >>caddy_${CADDY_VERSION:1}_checksums.txt
         popd
     else
         exit 1

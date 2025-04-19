@@ -10,7 +10,7 @@ on:
         type: string
       caddy_version:
         description: Version of caddy to compile.
-        default: v2.9.1 # renovate: datasource=github-releases depName=caddyserver/caddy versioning=semver
+        default: v2.10.0 # renovate: datasource=github-releases depName=caddyserver/caddy versioning=semver
         required: true
         type: string
 

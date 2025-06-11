@@ -32,7 +32,7 @@ jobs:
           TRIMMED_VERSION=${CADDY_VERSION:1}
           echo "version=$TRIMMED_VERSION" >> $GITHUB_OUTPUT
 
-      - uses: softprops/action-gh-release@v2.3.0
+      - uses: softprops/action-gh-release@v2.3.2
         name: create release
         with:
           body: |
